@@ -13,3 +13,10 @@ This is a Random Smart Contract Lottery.
 3. Using chainlink VRF & Chainlink Automation
       1. Chainlink VRF -> Randomness
       2. Chainlink Automaion -> Time based trigger
+
+      /**
+ * @title Smart Contract Raffle
+ * @author dvdbyte
+ * @notice This contract is creating a sample raffle
+ * @dev Implementats Chainlink VRFv2
+ */
