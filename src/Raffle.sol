@@ -29,94 +29,72 @@ pragma solidity 0.8.18;
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 
+contract Raffle {
 
-
-
-contract Raffle is VRFConsumerBaseV2 {
-    error Raffle__NotEnoughEth();
+    error Raffle__NotEnoughFeeToEnterRaffle();
+    error Raffle__NotEnoughEthToPayWinner();
     error Raffle__NotEnoughTimeHasPassed();
-    error Raffle__CantEnterAtTheMoment();
+    error Raffle__CantEnterNoow();
 
-    uint256 immutable i_raffleFee;
-    uint256 immutable i_timeInterval;
+    uint256 private immutable i_entranceFee;
+    uint256 private immutable i_timeInterval;
+    
     uint256 private s_timeStamp;
 
-   VRFCoordinatorV2Interface COORDINATOR;
+    address payable [] s_players;
+    address payable [] recentWiner;
 
-  uint64 immutable i_subscriptionId;
-  address immutable i_owner;
-  address immutable i_vrfCoordinator;
-  bytes32 immutable i_keyHash; 
-  uint32 immutable i_callbackGasLimit;
+    RaffleState s_raffleState;
+    /**Events */
 
-  uint16 private constant REQUEST_CONFIRMATION = 3;
-  uint32 private constant NUM_WORDS =  1;
+    event enteredRaffle (address indexed player);
+    enum  RaffleState{
+        OPEN,
+        CALCULATING
+    }
 
-  RaffleState initial = RaffleState.OPEN;
-
-
-    address payable[] s_players;
-
-    enum RaffleState {OPEN, RUNNING}
-
-    event enteredRaffle(address indexed player);
-
-    constructor 
-    (
-      uint64 subscriptionId,
-      address vrfCoordinator,
-      bytes32 keyHash,
-      uint32 callbackGasLimit,
-
-      uint256 raffleFee, 
-      uint256 timeInterval) VRFConsumerBaseV2(vrfCoordinator)
-    {
-
-      i_subscriptionId = subscriptionId;
-      i_owner = msg.sender;
-      i_vrfCoordinator = vrfCoordinator;
-      i_keyHash = keyHash;
-      i_callbackGasLimit = callbackGasLimit;
-
-      i_raffleFee = raffleFee;
+    constructor(uint256 timeInterval) {
+      i_entranceFee = 0.1 ether;
+      s_timeStamp = block.timestamp;
       i_timeInterval = timeInterval;
-      s_timeStamp = block.timeStamp;
+      s_raffleState = RaffleState.OPEN;
     }
-  
-  function enterRaffle () external payable {
-    if (msg.value < i_raffleFee) {
-      revert Raffle__NotEnoughEth();
+    
+    function enterRaffle () external payable {
+      if(msg.value < i_entranceFee) {
+        revert Raffle__NotEnoughFeeToEnterRaffle();
+      }
+
+      if (s_raffleState != RaffleState.OPEN) {
+        revert Raffle__CantEnterNoow();
+      }
+      s_players.push(payable(msg.sender));
+      emit enteredRaffle(msg.sender);
     }
 
-    if (!initial) {
-      revert Raffle__CantEnterAtTheMoment();
+    function pickWinner() external {
+
+      if ((block.timestamp - s_timeStamp) < i_timeInterval) {
+          revert Raffle__NotEnoughTimeHasPassed();
+      }
+
+      s_raffleState == RaffleState.CALCULATING;
+
+
+      // uint256 indexOfWinner = randomWord[0] % s_players.length;
+      // address payable winner = s_players[indexOfWinner];
+      // recentWiner.push(winner);
+      // s_players = new address[](0);
+
+    
+      // (bool callSuccess,) = payable(winner).call{value: address(this).balance}("");
+      // if (!callSuccess) {
+      //  revert  Raffle__NotEnoughEthToPayWinner();
+      // }
+
+      s_raffleState = RaffleState.OPEN;
     }
 
-    s_players.push(payable(msg.sender));
-    emit enteredRaffle(msg.sender);
-  }
-
-
-  function pickWinner() external payable {
-    if ((block.timestamp - s_timeStamp) < i_timeInterval){
-        revert Raffle__NotEnoughTimeHasPassed();
-    }
-  uint256 requestId = COORDINATOR.requestRandomWords(
-        i_keyHash,
-        i_subscriptionId,
-        REQUEST_CONFIRMATION,
-        i_callbackGasLimit,
-        NUM_WORDS
-       );
-  }
-  
-  function fulfillRandomWords
-  (uint256 requestId, 
-  uint256[] memory randomWords
-  ) internal override {
-
-       
-  }
 
 
 
