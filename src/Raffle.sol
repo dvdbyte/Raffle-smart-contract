@@ -80,6 +80,14 @@ contract Raffle {
 
       s_raffleState == RaffleState.CALCULATING;
 
+    requestId = COORDINATOR.requestRandomWords(
+            keyHash,
+            s_subscriptionId,
+            requestConfirmations,
+            callbackGasLimit,
+            numWords
+      );
+
 
       // uint256 indexOfWinner = randomWord[0] % s_players.length;
       // address payable winner = s_players[indexOfWinner];
