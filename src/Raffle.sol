@@ -38,6 +38,13 @@ contract Raffle {
 
     uint256 private immutable i_entranceFee;
     uint256 private immutable i_timeInterval;
+
+    uint256 private immutable i_keyHash;
+    uint256 private immutable i_subscriptionId;
+    uint256 private immutable i_callbackGasLimit;
+
+    uint256 private constant REQUESTCONFIRMATIONS;
+    uint256 private constant NUMWORDS;
     
     uint256 private s_timeStamp;
 
@@ -53,7 +60,14 @@ contract Raffle {
         CALCULATING
     }
 
-    constructor(uint256 timeInterval) {
+    constructor(uint256 keyHash, subscriptionId, callbackGasLimit) {
+
+      i_keyHash =keyHash;
+      i_subscriptionId = subscriptionId;
+      i_callbackGasLimit = callbackGasLimit;
+
+      REQUESTCONFIRMATIONS = 3;
+      NUMWORDS= 1;
       i_entranceFee = 0.1 ether;
       s_timeStamp = block.timestamp;
       i_timeInterval = timeInterval;
@@ -81,11 +95,11 @@ contract Raffle {
       s_raffleState == RaffleState.CALCULATING;
 
     requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            s_subscriptionId,
-            requestConfirmations,
+            i_keyHash,
+            i_subscriptionId,
+             REQUESTCONFIRMATIONS,
             callbackGasLimit,
-            numWords
+            NUMWORDS
       );
 
 
