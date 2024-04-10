@@ -20,3 +20,27 @@ This is a Random Smart Contract Lottery.
  * @notice This contract is creating a sample raffle
  * @dev Implementats Chainlink VRFv2
  */
+
+/** /////////////////////////////////
+///////Layout of Contract:///////
+/////////////////////////////////
+// version
+// imports
+// errors
+// interfaces, libraries, contracts
+// Type declarations
+// State variables
+// Events
+// Modifiers
+// Functions
+// Layout of Functions:
+// constructor
+// receive function (if exists)
+// fallback function (if exists)
+// external
+// public
+// internal
+// private
+// internal & private view & pure functions
+// external & public view & pure functions
+
